@@ -1,0 +1,9 @@
+git status
+git add .
+git commit -m ""
+git push
+
+never touch vendor/
+var/ = cache & logs
+
+exclude .env from all
