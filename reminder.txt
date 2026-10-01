@@ -7,3 +7,11 @@ never touch vendor/
 var/ = cache & logs
 
 exclude .env from all
+
+
+to install bootsrap easy
+https://symfony.com/doc/current/frontend/asset_mapper.html
+
+
+php bin/console importmap:require bootstrap/dist/css/bootstrap.min.css
+css handle to add to app.js

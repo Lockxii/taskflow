@@ -11,14 +11,21 @@ final class HomeController extends AbstractController
     #[Route(path :'/', name:'home')]
     public function index(): Response
     {
+        $this->flashnews('A new way to control your tasks !');
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
         ]);
     }
 
+    private function flashnews(string $message): void
+    {
+        $this->addFlash('success', $message);
+    }
+
     #[Route(path :'/a-propos', name:'a-propos')]
     public function info(): Response
     {
+        $this->flashnews('A new way to control your tasks !');
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
         ]);

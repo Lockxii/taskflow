@@ -1,0 +1,1126 @@
+{% block header %}
+
+    <!-- POPPINS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        /* ==========================================
+           RESET HEADER
+        ========================================== */
+
+        .header-wrapper *,
+        .header-wrapper *::before,
+        .header-wrapper *::after {
+            box-sizing: border-box;
+        }
+
+
+        /* ==========================================
+           WRAPPER
+
+           Sticky = reste dans le flux de la page.
+           Donc il ne recouvre PAS ton contenu
+           au chargement.
+        ========================================== */
+
+        .header-wrapper {
+            width: 100%;
+
+            padding: 14px 0 9px;
+
+            position: sticky;
+            top: 0;
+
+            z-index: 1000;
+
+            pointer-events: none;
+
+            font-family: 'Poppins', sans-serif;
+        }
+
+
+        /* ==========================================
+           NAVBAR
+        ========================================== */
+
+        .taskflow-navbar {
+
+            width: 70%;
+            max-width: 950px;
+
+            min-height: 58px;
+
+            margin: 0 auto;
+
+            padding: 7px 9px 7px 18px;
+
+            display: flex;
+            align-items: center;
+
+            background: rgba(255, 255, 255, 0.88);
+
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+
+            border: 1px solid rgba(0, 0, 0, 0.08);
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.025),
+                0 4px 14px rgba(0, 0, 0, 0.035);
+
+            pointer-events: auto;
+
+            transition:
+                background 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+
+            animation:
+                navbarEntrance
+                0.65s
+                cubic-bezier(.16, 1, .3, 1);
+        }
+
+
+        @keyframes navbarEntrance {
+
+            from {
+                opacity: 0;
+
+                transform:
+                    translateY(-10px)
+                    scale(0.985);
+            }
+
+            to {
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+
+        /* ==========================================
+           NAVBAR QUAND ON SCROLL
+        ========================================== */
+
+        .taskflow-navbar.scrolled {
+
+            background: rgba(255, 255, 255, 0.78);
+
+            border-color: rgba(0, 0, 0, 0.09);
+
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.03),
+                0 8px 24px rgba(0, 0, 0, 0.055);
+        }
+
+
+
+        /* ==========================================
+           TASKFLOW
+        ========================================== */
+
+        .taskflow-logo {
+
+            display: flex;
+            align-items: center;
+
+            flex-shrink: 0;
+
+            margin-right: 18px;
+
+            color: #111111;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 19px;
+            font-weight: 600;
+
+            letter-spacing: -0.8px;
+
+            line-height: 1;
+
+            user-select: none;
+        }
+
+
+        /* ==========================================
+           SEPARATEUR
+        ========================================== */
+
+        .navbar-divider {
+
+            width: 1px;
+            height: 25px;
+
+            flex-shrink: 0;
+
+            margin-right: 11px;
+
+            background: #e4e4e4;
+        }
+
+
+
+        /* ==========================================
+           NAVIGATION
+        ========================================== */
+
+        .taskflow-nav {
+
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            gap: 3px;
+
+            padding: 3px;
+
+            flex: 1;
+        }
+
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+
+
+        /* ==========================================
+           PILL ANIMÉE
+
+           C'est elle qui glisse réellement
+           entre Accueil et À propos
+        ========================================== */
+
+        .nav-slider {
+
+            position: absolute;
+
+            top: 3px;
+            left: 3px;
+
+            height: calc(100% - 6px);
+
+            width: 0;
+
+
+
+            border: 1px solid rgba(0, 0, 0, 0.28);
+
+            border-radius: 10px;
+
+            background: linear-gradient(180deg, #3b3b3b 0%, #292929 52%, #1c1c1c 100%);
+
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+                0 1px 3px rgba(0, 0, 0, 0.14);
+            pointer-events: none;
+
+            z-index: 0;
+
+            transition:
+                transform 0.52s cubic-bezier(.16, 1, .3, 1),
+                width 0.52s cubic-bezier(.16, 1, .3, 1);
+        }
+
+
+
+        /* ==========================================
+           NAV BUTTONS
+        ========================================== */
+
+        .nav-button {
+
+            display: block;
+
+            position: relative;
+
+            z-index: 2;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+
+            text-decoration: none;
+
+            padding: 9px 16px;
+
+            border-radius: 10px;
+
+            color: #777777;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 13px;
+            font-weight: 500;
+
+            line-height: 1.2;
+
+            white-space: nowrap;
+
+            cursor: pointer;
+
+            transition: color 0.25s ease;
+        }
+
+
+        .nav-button:hover {
+            color: #111111;
+        }
+
+
+        .nav-button.active {
+
+            color: #f0f0f0;
+
+            font-weight: 600;
+        }
+
+
+        .nav-button.is-moving {
+            color: #f0f0f0;
+            font-weight: 600;
+        }
+
+
+        .nav-button.is-leaving {
+            color: #777777;
+            font-weight: 500;
+        }
+
+
+        .nav-button:focus-visible {
+            outline: 2px solid #377dff;
+            outline-offset: 2px;
+        }
+
+
+
+        /* ==========================================
+           AUTH
+        ========================================== */
+
+        .navbar-auth {
+
+            display: flex;
+            align-items: center;
+
+            gap: 7px;
+
+            margin-left: auto;
+
+            padding-left: 12px;
+        }
+
+
+        .navbar-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            padding: 10px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .navbar-toggle span {
+            width: 18px;
+            height: 2px;
+            border-radius: 2px;
+            background: #202020;
+            transition: transform 0.25s ease, opacity 0.2s ease;
+        }
+
+        .navbar-toggle:focus-visible {
+            outline: 2px solid #377dff;
+            outline-offset: 2px;
+        }
+
+
+
+        /* ==========================================
+           LOGIN
+        ========================================== */
+
+        .login-button {
+
+            border: 1px solid #ffffff;
+
+            outline: 0;
+
+            background: #ffffff;
+
+            color: #111111;
+
+            padding: 9px 15px;
+
+            border-radius: 10px;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            line-height: 1.2;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.025);
+
+            transition:
+                background 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.2s cubic-bezier(.16, 1, .3, 1);
+        }
+
+
+        .login-button:hover {
+
+
+
+            border-color: #d4d4d4;
+
+            transform: translateY(-1px);
+        }
+
+
+        .login-button:active {
+            transform: scale(0.96);
+        }
+
+
+
+        /* ==========================================
+           REGISTER
+        ========================================== */
+
+        .register-button {
+
+            border: 1px solid #111111;
+
+            outline: 0;
+
+            background: linear-gradient(180deg, #214ba3 0%, #224a9c 52%, #377dff 100%);
+
+            color: #ffffff;
+
+            padding: 9px 16px;
+
+            border-radius: 10px;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            line-height: 1.2;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            box-shadow:
+                inset 0 1px 0 rgb(55 125 255),
+                inset 0 -2px 3px rgb(48 105 211),
+                0 1px 3px rgb(26 59 119);
+
+            transition:
+                background 0.25s ease,
+                transform 0.2s cubic-bezier(.16, 1, .3, 1),
+                box-shadow 0.25s ease;
+        }
+
+
+        .register-button:hover {
+
+
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 4px 10px rgba(0, 0, 0, 0.13);
+        }
+
+
+        .register-button:active {
+            transform: scale(0.96);
+        }
+
+
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 900px) {
+
+            .header-wrapper {
+                padding:
+                    12px 12px
+                    8px;
+            }
+
+
+            .taskflow-navbar {
+
+                width: 100%;
+
+                padding:
+                    7px 8px
+                    7px 14px;
+            }
+
+        }
+
+
+
+        @media (max-width: 680px) {
+
+            .taskflow-navbar {
+                min-height: 54px;
+            }
+
+
+            .taskflow-logo {
+
+                font-size: 16px;
+
+                margin-right: 10px;
+            }
+
+
+            .navbar-divider {
+
+                margin-right: 6px;
+
+                height: 22px;
+            }
+
+
+            .taskflow-nav {
+                gap: 1px;
+            }
+
+
+            .nav-button {
+
+                padding: 8px 10px;
+
+                font-size: 11px;
+            }
+
+
+            .navbar-auth {
+
+                gap: 4px;
+
+                padding-left: 5px;
+            }
+
+
+            .login-button {
+
+                padding: 8px 10px;
+
+                font-size: 11px;
+            }
+
+
+            .register-button {
+
+                padding: 8px 10px;
+
+                font-size: 11px;
+            }
+
+
+            .taskflow-navbar {
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+
+            .navbar-divider {
+                display: none;
+            }
+
+
+            .navbar-toggle {
+                display: flex;
+            }
+
+
+            .navbar-menu {
+                flex: 0 0 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                max-height: 0;
+                padding-top: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateY(-8px);
+                transition:
+                    max-height 0.35s ease,
+                    padding-top 0.35s ease,
+                    opacity 0.2s ease,
+                    transform 0.35s ease,
+                    visibility 0.35s;
+            }
+
+
+            .navbar-menu.is-open {
+                max-height: 240px;
+                padding-top: 12px;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+
+
+            .taskflow-nav {
+                width: 100%;
+                flex: none;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 3px;
+            }
+
+
+            .nav-slider {
+                display: none;
+            }
+
+
+            .nav-button {
+                width: 100%;
+                padding: 10px 12px;
+                text-align: left;
+            }
+
+
+            .nav-button.active {
+                border: 1px solid rgba(0, 0, 0, 0.28);
+                background: linear-gradient(180deg, #3b3b3b 0%, #292929 52%, #1c1c1c 100%);
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+                    0 1px 3px rgba(0, 0, 0, 0.14);
+            }
+
+
+            .navbar-auth {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                margin-left: 0;
+                padding: 0;
+            }
+
+
+            .login-button,
+            .register-button {
+                width: 100%;
+            }
+
+
+            .taskflow-navbar.menu-open .navbar-toggle span:first-child {
+                transform: translateY(6px) rotate(45deg);
+            }
+
+
+            .taskflow-navbar.menu-open .navbar-toggle span:nth-child(2) {
+                opacity: 0;
+            }
+
+
+            .taskflow-navbar.menu-open .navbar-toggle span:last-child {
+                transform: translateY(-6px) rotate(-45deg);
+            }
+
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+            .navbar-menu,
+            .navbar-toggle span {
+                transition: none;
+            }
+        }
+
+
+
+    </style>
+
+
+
+    <header class="header-wrapper">
+
+        <nav class="taskflow-navbar">
+
+
+            <!-- ==============================
+                 LOGO TEXTE UNIQUEMENT
+            =============================== -->
+
+            <div class="taskflow-logo">
+                TASKFLOW
+            </div>
+
+
+
+            <!-- SEPARATEUR -->
+
+            <div class="navbar-divider"></div>
+
+            <button
+                class="navbar-toggle"
+                type="button"
+                aria-label="Ouvrir le menu"
+                aria-expanded="false"
+                aria-controls="navbarMenu"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+
+
+            <!-- ==============================
+                 NAVIGATION
+            =============================== -->
+
+            <div class="navbar-menu" id="navbarMenu">
+                <div class="taskflow-nav">
+
+
+                <!-- PILL QUI GLISSE -->
+
+                <div class="nav-slider"></div>
+
+
+
+                <!-- ACCUEIL -->
+
+                <a
+                    class="nav-button{% if app.request.attributes.get('_route') == 'home' %} active{% endif %}"
+                    data-page="home"
+                    href="{{ path('home') }}"
+                >
+                    Accueil
+                </a>
+
+
+
+                <!-- À PROPOS -->
+
+                <a
+                    class="nav-button{% if app.request.attributes.get('_route') == 'a-propos' %} active{% endif %}"
+                    data-page="about"
+                    href="{{ path('a-propos') }}"
+                >
+                    À propos
+                </a>
+
+
+            </div>
+
+
+
+            <!-- ==============================
+                 LOGIN / REGISTER
+            =============================== -->
+
+            <div class="navbar-auth">
+
+
+                <button
+                    type="button"
+                    class="login-button"
+                    id="loginButton"
+                >
+                    Login
+                </button>
+
+
+
+                <button
+                    type="button"
+                    class="register-button"
+                    id="registerButton"
+                >
+                    Register
+                </button>
+
+
+            </div>
+
+            </div>
+
+
+        </nav>
+
+    </header>
+
+
+
+    <script>
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+
+
+                const navbar =
+                    document.querySelector(
+                        '.taskflow-navbar'
+                    );
+
+
+                const slider =
+                    document.querySelector(
+                        '.nav-slider'
+                    );
+
+
+                const navButtons =
+                    document.querySelectorAll(
+                        '.nav-button'
+                    );
+
+
+                const menuToggle =
+                    document.querySelector('.navbar-toggle');
+
+                const mobileMenu =
+                    document.getElementById('navbarMenu');
+
+
+                function setMenuOpen(open) {
+                    mobileMenu.classList.toggle('is-open', open);
+                    navbar.classList.toggle('menu-open', open);
+                    menuToggle.setAttribute('aria-expanded', String(open));
+                    menuToggle.setAttribute(
+                        'aria-label',
+                        open ? 'Fermer le menu' : 'Ouvrir le menu'
+                    );
+                }
+
+
+                menuToggle.addEventListener('click', function () {
+                    setMenuOpen(!mobileMenu.classList.contains('is-open'));
+                });
+
+
+                document.addEventListener('keydown', function (event) {
+                    if (
+                        event.key === 'Escape'
+                        && mobileMenu.classList.contains('is-open')
+                    ) {
+                        setMenuOpen(false);
+                        menuToggle.focus();
+                    }
+                });
+
+
+
+                /* ==================================
+                   DÉPLACEMENT DE LA PILL
+                ================================== */
+
+                function moveSlider(
+                    button,
+                    instant = false
+                ) {
+
+                    if (!button) {
+                        return;
+                    }
+
+
+                    const position = button.offsetLeft - 3;
+
+
+
+                    if (instant) {
+
+                        slider.style.transition =
+                            'none';
+
+                    }
+
+
+
+                    slider.style.width =
+                        button.offsetWidth
+                        + 'px';
+
+
+
+                    slider.style.transform =
+                        'translateX('
+                        +
+                        position
+                        +
+                        'px)';
+
+
+
+                    /*
+                        Réactive l'animation après
+                        le positionnement initial
+                    */
+
+                    if (instant) {
+
+                        requestAnimationFrame(
+                            function () {
+
+                                requestAnimationFrame(
+                                    function () {
+
+                                        slider.style.transition =
+                                            '';
+
+                                    }
+                                );
+
+                            }
+                        );
+
+                    }
+
+                }
+
+
+
+                /* ==================================
+                   POSITION INITIALE
+                ================================== */
+
+                const initialActive =
+                    document.querySelector(
+                        '.nav-button.active'
+                    );
+
+
+                /*
+                    petit délai pour être sûr
+                    que Poppins + layout soient chargés
+                */
+
+                setTimeout(
+                    function () {
+
+                        moveSlider(
+                            initialActive,
+                            true
+                        );
+
+                    },
+                    50
+                );
+
+
+
+                let navigationTimer;
+
+                navButtons.forEach(function (button) {
+                    button.addEventListener('click', function (event) {
+                        if (
+                            event.button !== 0
+                            || event.ctrlKey
+                            || event.metaKey
+                            || event.shiftKey
+                            || event.altKey
+                            || window.matchMedia(
+                                '(max-width: 680px), (prefers-reduced-motion: reduce)'
+                            ).matches
+                            || button.classList.contains('active')
+                        ) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        window.clearTimeout(navigationTimer);
+
+                        navButtons.forEach(function (navButton) {
+                            navButton.classList.remove('is-moving', 'is-leaving');
+                        });
+
+                        const activeButton =
+                            document.querySelector('.nav-button.active');
+
+                        if (activeButton) {
+                            activeButton.classList.add('is-leaving');
+                        }
+
+                        button.classList.add('is-moving');
+                        moveSlider(button);
+
+                        navigationTimer = window.setTimeout(function () {
+                            window.location.assign(button.href);
+                        }, 520);
+                    });
+                });
+
+
+
+                /* ==================================
+                   RESIZE
+                ================================== */
+
+                window.addEventListener(
+                    'resize',
+                    function () {
+                        if (window.innerWidth > 680) {
+                            setMenuOpen(false);
+                        }
+
+                        const active =
+                            document.querySelector(
+                                '.nav-button.active'
+                            );
+
+
+                        moveSlider(
+                            active,
+                            true
+                        );
+                    }
+                );
+
+
+
+                /* ==================================
+                   SCROLL
+                ================================== */
+
+                window.addEventListener(
+                    'scroll',
+                    function () {
+
+
+                        if (
+                            window.scrollY
+                            > 15
+                        ) {
+
+                            navbar.classList.add(
+                                'scrolled'
+                            );
+
+                        }
+
+                        else {
+
+                            navbar.classList.remove(
+                                'scrolled'
+                            );
+
+                        }
+
+                    },
+                    {
+                        passive: true
+                    }
+                );
+
+
+
+                /* ==================================
+                   LOGIN
+                ================================== */
+
+                document
+                    .getElementById(
+                        'loginButton'
+                    )
+                    .addEventListener(
+                        'click',
+                        function () {
+
+                            setMenuOpen(false);
+
+
+
+
+                                window.location.href =
+                                    "/login";
+
+
+                            console.log(
+                                'Login'
+                            );
+
+                        }
+                    );
+
+
+
+                /* ==================================
+                   REGISTER
+                ================================== */
+
+                document
+                    .getElementById(
+                        'registerButton'
+                    )
+                    .addEventListener(
+                        'click',
+                        function () {
+
+                            setMenuOpen(false);
+
+                                window.location.href =
+                                    "/register";
+
+
+                            console.log(
+                                'Register'
+                            );
+
+                        }
+                    );
+
+
+            }
+        );
+
+    </script>
+
+{% endblock %}
