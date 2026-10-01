@@ -1,0 +1,311 @@
+==========================================================================
+  TASKFLOW - SYMFONY PERSONAL GUIDE
+  "How do I do X?"  -> find the section, follow the steps.
+==========================================================================
+
+TABLE OF CONTENTS
+  1. Daily routine
+  2. Git
+  3. Docker & local server
+  4. The console (how to find any command by yourself)
+  5. "make" commands (code generators)
+  6. Database: entities, migrations, fixtures
+  7. HOW TO ANSWER make:entity QUESTIONS (the method)
+  8. Routes
+  9. Twig (templates)
+ 10. Debugging: when something breaks
+ 11. Golden rules
+
+
+--------------------------------------------------------------------------
+1. DAILY ROUTINE
+--------------------------------------------------------------------------
+  1) Open Docker Desktop, wait for "Engine running" (green)
+  2) docker compose up -d          -> starts the database + Mailpit
+  3) symfony serve -d              -> starts the website (https://127.0.0.1:8000)
+  4) Code...
+  5) git add . / git commit -m "..." / git push
+
+  End of session (optional):
+     symfony server:stop
+     docker compose stop
+
+
+--------------------------------------------------------------------------
+2. GIT
+--------------------------------------------------------------------------
+  git status                   what changed?
+  git add .                    prepare ALL changes
+  git commit -m "message"      save a checkpoint (message = what you did)
+  git push                     send to GitHub
+  git log --oneline            list of previous commits
+  git diff                     see the exact changes not yet added
+
+  Committed:      .env (default values, no secrets)
+  NEVER commit:   .env.local (your personal values / passwords)
+  Never touch:    vendor/ (libraries, managed by Composer)
+  Can delete:     var/ (cache & logs, rebuilt automatically)
+
+
+--------------------------------------------------------------------------
+3. DOCKER & LOCAL SERVER
+--------------------------------------------------------------------------
+  docker compose up -d                 start the containers (database, mail)
+  docker compose ps                    what is running?
+  docker compose logs database         database logs (when it fails)
+  docker compose stop                  pause (data is kept)
+  docker compose down                  remove containers (data is kept)
+  docker compose down -v               !!! removes the data too !!!
+  docker compose port database 5432    which port to use in DBeaver
+
+  symfony serve -d                     start the web server
+  symfony server:stop                  stop it
+  symfony server:log                   live logs (Ctrl+C to quit)
+  symfony open:local                   open the site in the browser
+  symfony open:local:webmail           open Mailpit (fake mailbox)
+  symfony server:ca:install            fix the HTTPS certificate warning
+
+  ALWAYS use "symfony console ..." and NOT "php bin/console ..."
+  -> the Symfony CLI injects the Docker database/mail settings automatically.
+
+
+--------------------------------------------------------------------------
+4. THE CONSOLE - HOW TO FIND ANY COMMAND BY YOURSELF
+--------------------------------------------------------------------------
+  symfony console list                 ALL available commands
+  symfony console list make            only the "make:" commands
+  symfony console list doctrine        only the database commands
+  symfony console <command> --help     explains a command + its options
+
+  Useful "debug:" commands (they answer "what exists in my app?"):
+  symfony console debug:router             all routes (name, method, URL)
+  symfony console debug:router home        details of one route
+  symfony console debug:autowiring mailer  which service to inject for X
+  symfony console debug:twig               Twig functions & filters
+  symfony console debug:event-dispatcher   events and their listeners
+  symfony console debug:config framework   current configuration
+
+  symfony console cache:clear              when something "should work but doesn't"
+
+
+--------------------------------------------------------------------------
+5. "MAKE" COMMANDS (they write the code for you)
+--------------------------------------------------------------------------
+  I want to...                         Command
+  -----------------------------------  ---------------------------------
+  create a page                        symfony console make:controller Name
+  create / edit a table                symfony console make:entity Name
+  create the user class (login)        symfony console make:user
+  create the DB change file            symfony console make:migration
+  create a form                        symfony console make:form Name
+  generate a full CRUD (to study)      symfony console make:crud Entity
+  create a login page                  symfony console make:security:form-login
+  create a registration page           symfony console make:registration-form
+  create a voter (permissions)         symfony console make:voter Name
+  create a console command             symfony console make:command app:name
+  create a Twig extension              symfony console make:twig-extension
+  create an event subscriber           symfony console make:subscriber
+  create fake-data factory (Foundry)   symfony console make:factory
+  create a Messenger message           symfony console make:message
+
+  Tip: after any make: command, OPEN the generated files and read them.
+
+
+--------------------------------------------------------------------------
+6. DATABASE: ENTITIES, MIGRATIONS, FIXTURES
+--------------------------------------------------------------------------
+  Entity = PHP class (src/Entity)  ->  table in the database
+  Property                         ->  column
+  Object                           ->  row
+
+  THE WORKFLOW (every time you change an entity):
+    1) symfony console make:entity Name        (create or add fields)
+    2) symfony console make:migration          (writes the SQL file)
+    3) open migrations/VersionXXXX.php and READ it
+    4) symfony console doctrine:migrations:migrate
+    5) symfony console doctrine:schema:validate   -> 2 x [OK] expected
+
+  Rule: NEVER edit a migration that was already executed. Make a new one.
+
+  Other useful commands:
+    symfony console doctrine:migrations:status     which migrations ran
+    symfony console doctrine:fixtures:load         reset DB + fake data
+    symfony console dbal:run-sql "SELECT 1"        test the DB connection
+
+
+--------------------------------------------------------------------------
+7. HOW TO ANSWER make:entity QUESTIONS (the method, no AI needed)
+--------------------------------------------------------------------------
+  BEFORE running the command, write a plan on paper:
+
+    | I want to store...   | What kind of info?     | Can it be empty? |
+    | the comment content  | long text              | no               |
+    | who wrote it         | link to a User         | no               |
+
+  Then each maker question is just a question from your plan:
+
+  "New property name"
+     -> What do I call it in the code?
+        English, camelCase (dueDate, createdBy).
+        Singular for ONE thing (project, author), plural for a LIST (tasks).
+        Never a reserved word (user, order, group...) -> use author,
+        assignee, owner...
+
+  "Field type"   (type ? to see the full list)
+     short text (name, title, email) ........ string
+     long text (description, comment) ....... text
+     whole number ........................... integer
+     yes / no ............................... boolean
+     a day .................................. date_immutable
+     a day + time (a precise moment) ........ datetime_immutable
+     a choice in a fixed list ............... enum
+     A LINK TO ANOTHER ENTITY ............... relation
+
+  "Field length"
+     -> Max characters in real life? (first name: 50, title: 255)
+
+  "Can this field be null"
+     -> Can this NOT exist?  Task without title? impossible -> no
+                             Task without description? possible -> yes
+
+  "Relation type"   -> ask 2 questions:
+     "ONE comment belongs to HOW MANY tasks?"   -> 1
+     "ONE task has HOW MANY comments?"          -> many
+        1 / many ......... ManyToOne   (the most common)
+        many / many ...... ManyToMany
+        1 / 1 ............ OneToOne    (rare)
+     !! The maker prints a table with English sentences
+        ("Each Comment relates to one Task...").
+        Read them and pick the one that is TRUE.
+
+  "Do you want to add a new property to X so that you can access...?"
+     -> Will I need the list from the other side?
+        "show the comments OF A TASK"  -> yes
+        "show comments written BY A USER" -> probably no
+
+  "New field name inside X [tasks]"
+     -> The suggestion in [brackets] is good: just press Enter.
+
+  "orphanRemoval"
+     -> If removed from its parent, should it be deleted?
+        A comment without a task makes no sense -> yes
+
+  Made a mistake? Not a problem:
+     - fix the PHP file by hand, or delete the property and re-run the maker
+     - symfony console doctrine:schema:validate tells you if relations are OK
+     - before the migration, nothing is in the database yet
+
+
+--------------------------------------------------------------------------
+8. ROUTES
+--------------------------------------------------------------------------
+  A route = URL -> controller method. Declared above the method:
+
+      #[Route('/about', name: 'app_about')]
+      public function about(): Response { ... }
+
+  - path  : the URL
+  - name  : unique ID, used to create links (convention: app_xxx)
+  - URL parameter:    '/hello/{name}'  -> method argument $name
+  - requirements:     requirements: ['name' => '[a-z]+']  (else 404)
+  - only POST:        methods: ['POST']
+  - #[Route] ABOVE THE CLASS = a PREFIX added to every route of the class
+      (class '/blog' + method '/articles' = '/blog/articles')
+
+  Links in Twig ALWAYS use the route NAME, never the URL:
+      <a href="{{ path('app_about') }}">About</a>
+      <a href="{{ path('bonjour', {prenom: 'arthur'}) }}">Hi</a>
+      url('...') = same but absolute (https://...) -> for emails
+
+  List all routes:   symfony console debug:router
+
+  MY CURRENT ROUTES
+    home        /                   HomeController::index
+    a-propos    /a-propos           HomeController::info
+    bonjour     /bonjour/{prenom}   HomeController::bonjour
+
+  PLANNED ROUTES (from the Trello tutorials)
+    app_login             /login
+    app_logout            /logout
+    app_register          /register
+    app_account           /mon-compte
+    app_dashboard         /dashboard
+    app_workspace_new     /workspaces/new
+    app_workspace_show    /w/{slug}
+    app_workspace_edit    /w/{slug}/edit
+    app_workspace_delete  /w/{slug}/delete                 (POST)
+    app_workspace_members /w/{slug}/members
+    app_project_new       /w/{slug}/projects/new
+    app_project_show      /w/{slug}/projects/{projectSlug}
+    app_project_edit      /w/{slug}/projects/{projectSlug}/edit
+    app_project_delete    /w/{slug}/projects/{projectSlug}/delete (POST)
+    app_project_board     /w/{slug}/projects/{projectSlug}/board  (Kanban)
+    app_task_new          /w/{slug}/projects/{projectSlug}/tasks/new
+    app_task_show         /w/{slug}/projects/{projectSlug}/tasks/{id}
+    app_task_edit         /w/{slug}/projects/{projectSlug}/tasks/{id}/edit
+    app_task_delete       /w/{slug}/projects/{projectSlug}/tasks/{id}/delete (POST)
+    app_my_tasks          /mes-taches
+    app_invitation_accept /invitation/{token}
+    (admin)               /admin   (EasyAdmin, ROLE_ADMIN only)
+    (api)                 /api     (API Platform)
+
+
+--------------------------------------------------------------------------
+9. TWIG (templates/)
+--------------------------------------------------------------------------
+  {{ variable }}           DISPLAY something
+  {% if / for / block %}   DO something
+  {# comment #}            comment
+
+  {% extends 'base.html.twig' %}     my page uses the common layout
+  {% block body %}...{% endblock %}  fill a "hole" of the layout
+     !! In a child template, everything must be INSIDE a block.
+
+  {{ include('_partials/_navbar.html.twig') }}   insert a piece
+
+  Global variable "app":
+     app.user            logged-in user (or null)
+     app.current_route   name of the current route
+     app.flashes         flash messages
+  is_granted('ROLE_ADMIN')   true/false
+
+  Pass data from the controller:
+     return $this->render('page.html.twig', ['name' => 'Arthur']);
+     -> {{ name }} in Twig
+
+  Flash message:
+     controller:  $this->addFlash('success', 'Saved!');
+     Twig:        loop on app.flashes (see _partials/_flash.html.twig)
+
+
+--------------------------------------------------------------------------
+10. DEBUGGING: WHEN SOMETHING BREAKS
+--------------------------------------------------------------------------
+  1) READ THE WHOLE ERROR MESSAGE. Symfony often gives the solution.
+  2) Look at the Profiler (black bar at the bottom of the page):
+       Request/Response, Routing, Twig, Doctrine (SQL), Security, Mailer
+  3) Common errors:
+     "Unable to find template"        -> typo in the file name/path
+     "No route found"                 -> check debug:router
+     "...cannot include content outside Twig blocks"
+                                      -> put the code inside a {% block %}
+     "could not find driver"          -> PHP extension pdo_pgsql missing
+     "Connection refused"             -> Docker not started, or used
+                                         php bin/console instead of symfony console
+     "no PHP binaries detected"       -> close & reopen the editor
+     "Name X is a reserved word"      -> choose another property name
+  4) symfony console cache:clear
+  5) symfony server:log   (live errors)
+
+
+--------------------------------------------------------------------------
+11. GOLDEN RULES
+--------------------------------------------------------------------------
+  - symfony console, never php bin/console
+  - Links with path('route_name'), never hard-coded URLs
+  - Never edit an executed migration
+  - Never delete with a GET link: POST form + CSRF token
+  - Hiding a button is NOT security: protect the controller (voters)
+  - Commit at the end of every step
+  - Read the generated code, don't just copy it
+==========================================================================

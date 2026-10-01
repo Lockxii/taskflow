@@ -25,3 +25,5 @@ symfony serve -d
 Coder 🧑‍💻
 
 En fin de session (facultatif) : docker compose stop et symfony server:stop
+
+symfony console make:entity User 2x to add lastname firstname, createdAt

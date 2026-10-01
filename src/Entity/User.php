@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -10,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -31,6 +34,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $lastName = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    /**
+     * @var Collection<int, Membership>
+     */
+    #[ORM\OneToMany(targetEntity: Membership::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $memberships;
+
+    public function __construct()
+    {
+        $this->memberships = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -103,7 +126,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
-        
+
         return $data;
     }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Membership>
+     */
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
+    }
+
+    public function addMembership(Membership $membership): static
+    {
+        if (!$this->memberships->contains($membership)) {
+            $this->memberships->add($membership);
+            $membership->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMembership(Membership $membership): static
+    {
+        if ($this->memberships->removeElement($membership)) {
+            if ($membership->getUser() === $this) {
+                $membership->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+    #[ORM\PrePersist]
+    public function onCreate(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTimeImmutable();
+        }
+    }
+
 }
