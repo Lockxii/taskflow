@@ -15,3 +15,13 @@ https://symfony.com/doc/current/frontend/asset_mapper.html
 
 php bin/console importmap:require bootstrap/dist/css/bootstrap.min.css
 css handle to add to app.js
+
+Lancer Docker Desktop
+
+docker compose up -d
+
+symfony serve -d
+
+Coder 🧑‍💻
+
+En fin de session (facultatif) : docker compose stop et symfony server:stop
